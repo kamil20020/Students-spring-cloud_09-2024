@@ -1,0 +1,15 @@
+include:
+  - ./student/docker-compose.yaml
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4:8.11.0
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mail.com
+      PGADMIN_DEFAULT_PASSWORD: microservices
+    ports:
+      - 8888:80
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin

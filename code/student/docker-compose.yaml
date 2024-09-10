@@ -1,0 +1,27 @@
+services:
+  student-db:
+    image: postgres:13-alpine
+    container_name: student-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  student:
+    container_name: student
+    build:
+      context: .
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://student-db:${DB_PORT}/${DB}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "9000:9000"
+    depends_on:
+      - student-db
