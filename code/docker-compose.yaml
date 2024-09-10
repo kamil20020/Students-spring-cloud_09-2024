@@ -2,6 +2,14 @@ include:
   - ./student/docker-compose.yaml
 
 services:
+  service-discovery:
+    container_name: service-discovery
+    build:
+      context: ./service-discovery
+    restart: always
+    ports:
+      - "8100:8100"
+
   pgadmin:
     image: dpage/pgadmin4:8.11.0
     container_name: pgadmin
