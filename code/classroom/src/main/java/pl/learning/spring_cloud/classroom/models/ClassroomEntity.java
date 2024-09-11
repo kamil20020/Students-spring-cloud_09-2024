@@ -1,4 +1,4 @@
-package com.example.demo;
+package pl.learning.spring_cloud.classroom.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,6 +24,6 @@ public class ClassroomEntity {
     private UUID courseId;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "classrooms_students", joinColumns = @JoinColumn(name = "classrom_id"))
+    @CollectionTable(name = "classes_students_ids", joinColumns = @JoinColumn(name = "class_id"))
     private Set<UUID> studentsIds;
 }

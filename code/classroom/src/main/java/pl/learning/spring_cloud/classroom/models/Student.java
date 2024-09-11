@@ -1,4 +1,4 @@
-package com.example.demo;
+package pl.learning.spring_cloud.classroom.models;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.example.demo;
+package pl.learning.spring_cloud.classroom;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,5 +9,4 @@ public class ClassApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ClassApplication.class, args);
 	}
-
 }
