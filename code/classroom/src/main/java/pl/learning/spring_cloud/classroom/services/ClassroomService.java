@@ -32,23 +32,9 @@ public class ClassroomService {
             .orElseThrow(EntityNotFoundException::new);
     }
 
-    private List<ClassroomHeader> map(List<ClassroomEntity> classes){
+    public List<ClassroomEntity> getAll(){
 
-        return classes.stream()
-            .map(classroom -> {
-
-                Course foundCourse;
-
-                return new ClassroomHeader(classroom.getId(), null);
-            })
-            .toList();
-    }
-
-    public List<ClassroomHeader> getClasses(){
-
-        List<ClassroomEntity> foundClasses = classroomRepository.findAll();
-
-        return map(foundClasses);
+        return classroomRepository.findAll();
     }
 
     public List<Course> getCoursesByStudentId(UUID studentId){
@@ -62,12 +48,11 @@ public class ClassroomService {
         return List.of();
     }
 
-    public List<ClassroomHeader> getStudentClasses(UUID studentId){
+    public List<ClassroomEntity> getStudentClasses(UUID studentId){
 
         Set<UUID> studentIds = Set.of(studentId);
-        List<ClassroomEntity> foundClasses = classroomRepository.findByStudentsIds(studentIds);
 
-        return map(foundClasses);
+        return classroomRepository.findByStudentsIdsContains(studentIds);
     }
 
     public List<Student> getClassStudents(UUID classId) throws EntityNotFoundException {
@@ -93,14 +78,14 @@ public class ClassroomService {
     }
 
     @Transactional
-    public ClassroomEntity addStudentToClass(UUID studentId, UUID classId) throws EntityNotFoundException {
+    public Student addStudentToClass(UUID studentId, UUID classId) throws EntityNotFoundException {
 
         ClassroomEntity foundClassroom = classroomRepository.findById(classId)
             .orElseThrow(EntityNotFoundException::new);
 
         foundClassroom.getStudentsIds().add(studentId);
 
-        return foundClassroom;
+        return studentService.getById(studentId);
     }
 
     @Transactional

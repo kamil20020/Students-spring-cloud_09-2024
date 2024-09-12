@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.learning.spring_cloud.classroom.mapper.ClassroomMapper;
 import pl.learning.spring_cloud.classroom.models.ClassroomEntity;
 import pl.learning.spring_cloud.classroom.models.ClassroomHeader;
 import pl.learning.spring_cloud.classroom.models.Student;
@@ -22,23 +23,25 @@ public class ClassroomController {
     @GetMapping
     public ResponseEntity<List<ClassroomHeader>> getClassesHeaders(){
 
-        List<ClassroomHeader> gotClasses = classroomService.getClasses();
+        List<ClassroomEntity> gotClasses = classroomService.getAll();
+        List<ClassroomHeader> convertedClasses = ClassroomMapper.map(gotClasses);
 
-        return ResponseEntity.ok(gotClasses);
+        return ResponseEntity.ok(convertedClasses);
     }
 
     @GetMapping("/students/{studentId}")
-    public ResponseEntity getStudentClasses(@PathVariable("studentId") String studentIdStr){
+    public ResponseEntity<List<ClassroomHeader>> getStudentClasses(@PathVariable("studentId") String studentIdStr){
 
         UUID studentId = UUID.fromString(studentIdStr);
 
-        List<ClassroomHeader> gotClasses = classroomService.getStudentClasses(studentId);
+        List<ClassroomEntity> gotClasses = classroomService.getStudentClasses(studentId);
+        List<ClassroomHeader> convertedClasses = ClassroomMapper.map(gotClasses);
 
-        return ResponseEntity.ok(gotClasses);
+        return ResponseEntity.ok(convertedClasses);
     }
 
     @GetMapping("/{classId}/students")
-    public ResponseEntity getClassStudents(@PathVariable("classId") String classIdStr){
+    public ResponseEntity<List<Student>> getClassStudents(@PathVariable("classId") String classIdStr){
 
         UUID classId = UUID.fromString(classIdStr);
 
@@ -48,26 +51,27 @@ public class ClassroomController {
     }
 
     @PostMapping
-    public ResponseEntity createClass(){
+    public ResponseEntity<ClassroomHeader> createClass(){
 
         ClassroomEntity createdClass = classroomService.createClass(UUID.randomUUID());
+        ClassroomHeader convertedClass = ClassroomMapper.map(createdClass);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdClass);
+        return ResponseEntity.status(HttpStatus.CREATED).body(convertedClass);
     }
 
     @PostMapping("/{classId}/students/{studentId}")
-    public ResponseEntity addStudentToClass(@PathVariable("classId") String classIdStr, @PathVariable("studentId") String studentIdStr){
+    public ResponseEntity<Student> addStudentToClass(@PathVariable("classId") String classIdStr, @PathVariable("studentId") String studentIdStr){
 
         UUID classId = UUID.fromString(classIdStr);
         UUID studentId = UUID.fromString(studentIdStr);
 
-        ClassroomEntity classHeader = classroomService.addStudentToClass(studentId, classId);
+        Student student = classroomService.addStudentToClass(studentId, classId);
 
-        return ResponseEntity.ok(classHeader);
+        return ResponseEntity.ok(student);
     }
 
     @DeleteMapping("/{classId}/students/{studentId}")
-    public ResponseEntity removeStudentFromClass(@PathVariable("classId") String classIdStr, @PathVariable("studentId") String studentIdStr){
+    public ResponseEntity<Void> removeStudentFromClass(@PathVariable("classId") String classIdStr, @PathVariable("studentId") String studentIdStr){
 
         UUID classId = UUID.fromString(classIdStr);
         UUID studentId = UUID.fromString(studentIdStr);
@@ -78,7 +82,7 @@ public class ClassroomController {
     }
 
     @DeleteMapping("/{classId}")
-    public ResponseEntity removeClassById(@PathVariable("classId") String classIdStr){
+    public ResponseEntity<Void> removeClassById(@PathVariable("classId") String classIdStr){
 
         UUID classId = UUID.fromString(classIdStr);
 
