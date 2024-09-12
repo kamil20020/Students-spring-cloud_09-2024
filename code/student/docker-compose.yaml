@@ -1,3 +1,4 @@
+version: '3.9'
 services:
   student-db:
     image: postgres:13-alpine
@@ -7,10 +8,14 @@ services:
       POSTGRES_DB: ${DB}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGPORT: ${DB_PORT}
+    expose:
+      - "${DB_PORT}"
     ports:
       - "${DB_PORT}:${DB_PORT}"
     volumes:
       - ./data/db:/var/lib/postgresql/data
+    command: -p ${DB_PORT}
 
   student:
     container_name: student
@@ -21,7 +26,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://student-db:${DB_PORT}/${DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      EUREKA_HOST: service-discovery
+      PORT: 9000
     ports:
       - "9000:9000"
     depends_on:
+      - service-discovery
       - student-db

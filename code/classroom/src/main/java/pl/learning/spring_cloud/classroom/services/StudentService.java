@@ -4,6 +4,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.learning.spring_cloud.classroom.exception.ServiceUnavaiable;
@@ -20,9 +21,12 @@ public class StudentService {
 
     private final CircuitBreakerFactory circuitBreakerFactory;
 
-    private static final String API_PREFIX = "http://localhost:9087/students";
+    private static final String API_PREFIX = "http://student/students";
 
-    public Student fallback(UUID classId, Throwable throwable) throws ServiceUnavaiable{
+    public Student fallback(UUID classId, Throwable throwable) throws ServiceUnavaiable {
+
+        throwable.printStackTrace();
+
         throw new ServiceUnavaiable("Student");
     }
 

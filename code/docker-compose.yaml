@@ -1,3 +1,4 @@
+version: '3.9'
 include:
   - ./student/docker-compose.yaml
   - ./classroom/docker-compose.yaml
