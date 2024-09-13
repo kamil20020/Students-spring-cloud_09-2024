@@ -15,17 +15,39 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
 
+    public boolean existsById(UUID id){
+
+        log.info("Exists by id " + id);
+
+        return studentRepository.existsById(id);
+    }
+
     public StudentEntity getById(UUID id) throws EntityNotFoundException{
+
+        log.info("Get by id" + id);
 
         return studentRepository.findById(id)
             .orElseThrow(EntityNotFoundException::new);
     }
 
+    public List<StudentEntity> getByIds(List<UUID> ids){
+
+        log.info("Get by ids " + ids.toString());
+
+        return studentRepository.findAllById(ids);
+    }
+
     public List<StudentEntity> getAll(){
+
+        log.info("Get all");
+
         return studentRepository.findAll();
     }
 
     public StudentEntity create(StudentEntity student){
+
+        log.info("Create student " + student.toString());
+
         return studentRepository.save(
             student
         );
@@ -34,9 +56,14 @@ public class StudentService {
     public void deleteById(UUID id) throws EntityNotFoundException{
 
         if(!studentRepository.existsById(id)){
+
+            log.error("Student does not exist " + id);
+
             throw new EntityNotFoundException();
         }
 
         studentRepository.deleteById(id);
+
+        log.info("Student was deleted " + id);
     }
 }

@@ -35,14 +35,4 @@ public class StudentService {
 
         return restTemplate.getForObject(API_PREFIX + "/{studentId}", Student.class, studentId);
     }
-
-    public void saveStudent(Student student){
-
-        circuitBreakerFactory
-            .create("createStudent")
-            .run(
-                () -> restTemplate.postForObject("/students/", student, Student.class),
-                throwable -> "fallback"
-            );
-    }
 }

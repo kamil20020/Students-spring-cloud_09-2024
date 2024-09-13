@@ -33,4 +33,5 @@ services:
       - "9000:9000"
     depends_on:
       - service-discovery
+      - distributed-tracing
       - student-db

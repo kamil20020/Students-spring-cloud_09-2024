@@ -1,8 +1,8 @@
-version: '3.9'
+version: "3.9"
 services:
-  classroom-db:
+  course-db:
     image: postgres:13-alpine
-    container_name: classroom-db
+    container_name: course-db
     restart: always
     environment:
       POSTGRES_DB: ${DB}
@@ -16,22 +16,20 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     command: -p ${DB_PORT}
-
-  classroom:
-    container_name: classroom
+  course:
     build:
       context: .
+    container_name: course
     restart: always
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://classroom-db:${DB_PORT}/${DB}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://course-db:${DB_PORT}/${DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       EUREKA_HOST: service-discovery
       ZIPKIN_HOST: distributed-tracing
-      PORT: 9200
     ports:
-      - "9200:9200"
+      - "9101:9101"
     depends_on:
       - service-discovery
       - distributed-tracing
-      - classroom-db
+      - course-db
