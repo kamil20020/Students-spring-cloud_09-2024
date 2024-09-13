@@ -9,8 +9,18 @@ services:
     build:
       context: ./service-discovery
     restart: always
+    environment:
+      ZIPKIN_HOST: distributed-tracing
     ports:
       - "8100:8100"
+
+  distributed-tracing:
+    image: openzipkin/zipkin:3.4
+    container_name: distributed-tracing
+    environment:
+      STORAGE_TYPE: mem
+    ports:
+      - "9411:9411"
 
   pgadmin:
     image: dpage/pgadmin4:8.11.0

@@ -28,11 +28,15 @@ public class ClassroomService {
 
     public ClassroomEntity getClassById(UUID classId) throws EntityNotFoundException {
 
+        log.info("Get class by id" + classId);
+
         return classroomRepository.findById(classId)
             .orElseThrow(EntityNotFoundException::new);
     }
 
     public List<ClassroomEntity> getAll(){
+
+        log.info("Get all classes");
 
         return classroomRepository.findAll();
     }
@@ -52,6 +56,8 @@ public class ClassroomService {
 
         Set<UUID> studentIds = Set.of(studentId);
 
+        log.info("Get student classes");
+
         return classroomRepository.findByStudentsIdsContains(studentIds);
     }
 
@@ -59,6 +65,8 @@ public class ClassroomService {
 
         ClassroomEntity foundClassroom = classroomRepository.findById(classId)
             .orElseThrow(EntityNotFoundException::new);
+
+        log.info("Found classroom" + foundClassroom.toString());
 
         Set<UUID> foundClassStudentsIds = foundClassroom.getStudentsIds();
 
@@ -74,6 +82,8 @@ public class ClassroomService {
             .studentsIds(new HashSet<>())
             .build();
 
+        log.info("Create classroom" + toCreateClassroom.toString());
+
         return classroomRepository.save(toCreateClassroom);
     }
 
@@ -83,7 +93,11 @@ public class ClassroomService {
         ClassroomEntity foundClassroom = classroomRepository.findById(classId)
             .orElseThrow(EntityNotFoundException::new);
 
+        log.info("Found classroom" + foundClassroom.toString());
+
         foundClassroom.getStudentsIds().add(studentId);
+
+        log.info("Added student" + studentId);
 
         return studentService.getById(studentId);
     }
@@ -94,15 +108,24 @@ public class ClassroomService {
         ClassroomEntity foundClassroom = classroomRepository.findById(classId)
             .orElseThrow(EntityNotFoundException::new);
 
+        log.info("Found classroom" + foundClassroom.toString());
+
         foundClassroom.getStudentsIds().remove(studentId);
+
+        log.info("Removed student" + studentId);
     }
 
     public void removeClassById(UUID classId) throws EntityNotFoundException {
 
         if(!classroomRepository.existsById(classId)){
+
+            log.error("Classrom does not exist" + classId);
+
             throw new EntityNotFoundException();
         }
 
         classroomRepository.deleteById(classId);
+
+        log.error("Classrom was deleted" + classId);
     }
 }
