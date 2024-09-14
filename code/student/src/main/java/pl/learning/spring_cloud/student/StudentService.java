@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.learning.spring_cloud.student.models.StudentEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +28,7 @@ public class StudentService {
         log.info("Get by id" + id);
 
         return studentRepository.findById(id)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(() -> new EntityNotFoundException("Student with given id does not exist"));
     }
 
     public List<StudentEntity> getByIds(List<UUID> ids){
@@ -59,7 +60,7 @@ public class StudentService {
 
             log.error("Student does not exist " + id);
 
-            throw new EntityNotFoundException();
+            throw new EntityNotFoundException("Student with given id does not exist");
         }
 
         studentRepository.deleteById(id);

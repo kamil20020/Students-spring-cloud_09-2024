@@ -27,11 +27,13 @@ public class StudentService {
 
         throwable.printStackTrace();
 
-        throw new ServiceUnavaiable("Student");
+        throw new ServiceUnavaiable("Student microservice is unavaiable");
     }
 
     @CircuitBreaker(name = "getStudentById", fallbackMethod = "fallback")
     public Student getById(UUID studentId){
+
+        log.info("Request: get student by id " + studentId);
 
         return restTemplate.getForObject(API_PREFIX + "/{studentId}", Student.class, studentId);
     }

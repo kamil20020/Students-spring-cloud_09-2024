@@ -1,10 +1,12 @@
 package pl.learning.spring_cloud.student;
 
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.learning.spring_cloud.student.models.CreateStudent;
+import pl.learning.spring_cloud.student.models.StudentEntity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +61,12 @@ public class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<StudentEntity> create(@RequestBody StudentEntity student){
+    public ResponseEntity<StudentEntity> create(@Valid @RequestBody CreateStudent createStudent){
+
+        StudentEntity student = StudentEntity.builder()
+            .firstname(createStudent.firstname())
+            .surname(createStudent.surname())
+            .build();
 
         StudentEntity createdStudent = studentService.create(student);
 

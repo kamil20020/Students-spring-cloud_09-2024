@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping(value = "/courses")
 public class CourseController {
 
     private final CourseService courseService;

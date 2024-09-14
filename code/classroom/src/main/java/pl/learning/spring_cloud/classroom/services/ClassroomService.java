@@ -31,7 +31,7 @@ public class ClassroomService {
         log.info("Get class by id" + classId);
 
         return classroomRepository.findById(classId)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(() -> new EntityNotFoundException("Class with given id does not exist"));
     }
 
     public List<ClassroomEntity> getAll(){
@@ -64,7 +64,7 @@ public class ClassroomService {
     public List<Student> getClassStudents(UUID classId) throws EntityNotFoundException {
 
         ClassroomEntity foundClassroom = classroomRepository.findById(classId)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(() -> new EntityNotFoundException("Class with given id does not exist"));
 
         log.info("Found classroom" + foundClassroom.toString());
 
@@ -91,7 +91,7 @@ public class ClassroomService {
     public Student addStudentToClass(UUID studentId, UUID classId) throws EntityNotFoundException {
 
         ClassroomEntity foundClassroom = classroomRepository.findById(classId)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(() -> new EntityNotFoundException("Class with given id does not exist"));
 
         log.info("Found classroom" + foundClassroom.toString());
 
@@ -106,7 +106,7 @@ public class ClassroomService {
     public void removeStudentFromClass(UUID studentId, UUID classId) throws EntityNotFoundException {
 
         ClassroomEntity foundClassroom = classroomRepository.findById(classId)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(() -> new EntityNotFoundException("Class with given id does not exist"));
 
         log.info("Found classroom" + foundClassroom.toString());
 
@@ -121,7 +121,7 @@ public class ClassroomService {
 
             log.error("Classrom does not exist" + classId);
 
-            throw new EntityNotFoundException();
+            throw new EntityNotFoundException("Class with given id does not exist");
         }
 
         classroomRepository.deleteById(classId);

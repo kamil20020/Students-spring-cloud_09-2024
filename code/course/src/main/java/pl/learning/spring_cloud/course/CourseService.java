@@ -29,7 +29,7 @@ public class CourseService {
         log.info("Get by id " + id);
 
         return courseRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException());
+            .orElseThrow(() -> new EntityNotFoundException("Course with given id does not exist"));
     }
 
     public List<CourseEntity> getAll(){
@@ -52,7 +52,7 @@ public class CourseService {
 
             log.error("Conflict name");
 
-            throw new ConflictException();
+            throw new ConflictException("Course with given name already exists");
         }
 
         log.info("Create");
@@ -70,7 +70,7 @@ public class CourseService {
 
             log.error("Does not exist " + id);
 
-            throw new EntityNotFoundException();
+            throw new EntityNotFoundException("Course with given name does not exist");
         }
 
         log.info("Delete by id " + id);
