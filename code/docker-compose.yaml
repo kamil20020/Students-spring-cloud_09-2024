@@ -5,6 +5,19 @@ include:
   - ./course/docker-compose.yaml
 
 services:
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: ./api-gateway
+    restart: always
+    environment:
+      EUREKA_HOST: service-discovery
+      ZIPKIN_HOST: distributed-tracing
+    ports:
+      - "8200:8200"
+    depends_on:
+      - service-discovery
+
   service-discovery:
     container_name: service-discovery
     build:
