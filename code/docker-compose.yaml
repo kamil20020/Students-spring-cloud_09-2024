@@ -25,6 +25,8 @@ services:
     build:
       context: ./config
     restart: always
+    environment:
+      ZIPKIN_HOST: distributed-tracing
     ports:
       - "8300:8300"
 
