@@ -39,3 +39,4 @@ services:
       - service-discovery
       - distributed-tracing
       - classroom-db
+      - events-queue

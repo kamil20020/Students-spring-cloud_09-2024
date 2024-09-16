@@ -48,3 +48,8 @@ services:
       PORT: 9300
     ports:
       - "9300:9300"
+    depends_on:
+      - service-discovery
+      - distributed-tracing
+      - events-db
+      - events-queue
