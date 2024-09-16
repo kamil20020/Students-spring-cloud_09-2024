@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.learning.spring_cloud.classroom.ClassroomRepository;
+import pl.learning.spring_cloud.classroom.config.EventsQueueProducer;
 import pl.learning.spring_cloud.classroom.models.ClassroomEntity;
 import pl.learning.spring_cloud.classroom.models.ClassroomHeader;
 import pl.learning.spring_cloud.classroom.models.Course;
@@ -27,6 +28,8 @@ public class ClassroomService {
 
     private final StudentService studentService;
     private final CourseService courseService;
+
+    private final EventsQueueProducer eventsQueueProducer;
 
     public ClassroomEntity getClassById(UUID classId) throws EntityNotFoundException {
 
@@ -96,7 +99,11 @@ public class ClassroomService {
 
         log.info("Create classroom" + toCreateClassroom.toString());
 
-        return classroomRepository.save(toCreateClassroom);
+        ClassroomEntity createdClass = classroomRepository.save(toCreateClassroom);
+
+        eventsQueueProducer.sendMessage("For course " + courseId + " was created class with id " + createdClass.getId());
+
+        return createdClass;
     }
 
     @Transactional
@@ -114,6 +121,8 @@ public class ClassroomService {
         foundClassroom.getStudentsIds().add(studentId);
 
         log.info("Added student" + studentId);
+
+        eventsQueueProducer.sendMessage("To class " + classId + " was added student " + studentId);
 
         return studentService.getById(studentId);
     }
@@ -133,6 +142,8 @@ public class ClassroomService {
         foundClassroom.getStudentsIds().remove(studentId);
 
         log.info("Removed student" + studentId);
+
+        eventsQueueProducer.sendMessage("From class " + classId + " was removed student " + studentId);
     }
 
     public void removeClassById(UUID classId) throws EntityNotFoundException {
@@ -147,5 +158,7 @@ public class ClassroomService {
         classroomRepository.deleteById(classId);
 
         log.error("Classrom was deleted" + classId);
+
+        eventsQueueProducer.sendMessage("Class " + classId + " was removed");
     }
 }

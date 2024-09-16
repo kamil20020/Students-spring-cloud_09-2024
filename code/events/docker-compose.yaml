@@ -1,8 +1,8 @@
-version: '3.9'
+version: "3.9"
 services:
-  classroom-db:
+  events-db:
     image: postgres:13-alpine
-    container_name: classroom-db
+    container_name: events-db
     restart: always
     environment:
       POSTGRES_DB: ${DB}
@@ -17,25 +17,34 @@ services:
       - ./data/db:/var/lib/postgresql/data
     command: -p ${DB_PORT}
 
-  classroom:
-    container_name: classroom
+  events-queue:
+    container_name: events-queue
     build:
       context: .
+      dockerfile: Dockerfile-queue
+    restart: always
+    volumes:
+      - ./data/queue/data:/var/lib/rabbitmq
+      - ./data/queue/log:/var/log/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  events:
+    container_name: events
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://classroom-db:${DB_PORT}/${DB}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://events-db:${DB_PORT}/${DB}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       EUREKA_HOST: service-discovery
       ZIPKIN_HOST: distributed-tracing
       EVENTS_QUEUE_HOST: events-queue
       EVENTS_QUEUE_PORT: 5672
-      EVENTS_EXCHANGE: internal.exchange
-      EVENTS_ROUTING_KEY: events.routing-key
-      PORT: 9200
+      EVENTS_QUEUE_NAME: events.queue
+      PORT: 9300
     ports:
-      - "9200:9200"
-    depends_on:
-      - service-discovery
-      - distributed-tracing
-      - classroom-db
+      - "9300:9300"

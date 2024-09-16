@@ -3,6 +3,7 @@ include:
   - ./student/docker-compose.yaml
   - ./classroom/docker-compose.yaml
   - ./course/docker-compose.yaml
+  - ./events/docker-compose.yaml
 
 services:
   api-gateway:
