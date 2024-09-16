@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.learning.spring_cloud.classroom.mapper.ClassroomMapper;
 import pl.learning.spring_cloud.classroom.models.ClassroomEntity;
 import pl.learning.spring_cloud.classroom.models.ClassroomHeader;
+import pl.learning.spring_cloud.classroom.models.Course;
 import pl.learning.spring_cloud.classroom.models.Student;
 import pl.learning.spring_cloud.classroom.services.ClassroomService;
 
@@ -19,12 +20,24 @@ import java.util.UUID;
 public class ClassroomController {
 
     private final ClassroomService classroomService;
+    private final ClassroomMapper classroomMapper;
+
+    @GetMapping("/{classId}")
+    public ResponseEntity<ClassroomHeader> getClassHeaderById(@PathVariable("classId") String classIdStr){
+
+        UUID classId = UUID.fromString(classIdStr);
+
+        ClassroomEntity foundClass = classroomService.getClassById(classId);
+        ClassroomHeader convertedClass = classroomMapper.map(foundClass);
+
+        return ResponseEntity.ok(convertedClass);
+    }
 
     @GetMapping
     public ResponseEntity<List<ClassroomHeader>> getClassesHeaders(){
 
         List<ClassroomEntity> gotClasses = classroomService.getAll();
-        List<ClassroomHeader> convertedClasses = ClassroomMapper.map(gotClasses);
+        List<ClassroomHeader> convertedClasses = classroomMapper.map(gotClasses);
 
         return ResponseEntity.ok(convertedClasses);
     }
@@ -35,9 +48,19 @@ public class ClassroomController {
         UUID studentId = UUID.fromString(studentIdStr);
 
         List<ClassroomEntity> gotClasses = classroomService.getStudentClasses(studentId);
-        List<ClassroomHeader> convertedClasses = ClassroomMapper.map(gotClasses);
+        List<ClassroomHeader> convertedClasses = classroomMapper.map(gotClasses);
 
         return ResponseEntity.ok(convertedClasses);
+    }
+
+    @GetMapping("/students/{studentId}/courses")
+    public ResponseEntity<List<Course>> getStudentCourses(@PathVariable("studentId") String studentIdStr){
+
+        UUID studentId = UUID.fromString(studentIdStr);
+
+        List<Course> courses = classroomService.getCoursesByStudentId(studentId);
+
+        return ResponseEntity.ok(courses);
     }
 
     @GetMapping("/{classId}/students")
@@ -50,11 +73,13 @@ public class ClassroomController {
         return ResponseEntity.ok(gotStudents);
     }
 
-    @PostMapping
-    public ResponseEntity<ClassroomHeader> createClass(){
+    @PostMapping("/{courseId}")
+    public ResponseEntity<ClassroomHeader> createClass(@PathVariable("courseId") String courseIdStr){
 
-        ClassroomEntity createdClass = classroomService.createClass(UUID.randomUUID());
-        ClassroomHeader convertedClass = ClassroomMapper.map(createdClass);
+        UUID courseId = UUID.fromString(courseIdStr);
+
+        ClassroomEntity createdClass = classroomService.createClass(courseId);
+        ClassroomHeader convertedClass = classroomMapper.map(createdClass);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(convertedClass);
     }

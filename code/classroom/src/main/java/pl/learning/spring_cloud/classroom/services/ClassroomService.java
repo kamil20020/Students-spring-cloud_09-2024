@@ -1,5 +1,6 @@
 package pl.learning.spring_cloud.classroom.services;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class ClassroomService {
     private final ClassroomRepository classroomRepository;
 
     private final StudentService studentService;
+    private final CourseService courseService;
 
     public ClassroomEntity getClassById(UUID classId) throws EntityNotFoundException {
 
@@ -41,20 +43,28 @@ public class ClassroomService {
         return classroomRepository.findAll();
     }
 
-    public List<Course> getCoursesByStudentId(UUID studentId){
+    public List<Course> getCoursesByStudentId(UUID studentId) throws EntityNotFoundException{
+
+        if(!studentService.doesExist(studentId)){
+            throw new EntityNotFoundException("Student with given id does not exist");
+        }
 
         Set<UUID> studentIds = Set.of(studentId);
-//        List<UUID> coursesIds = classroomRepository.findByStudentsIds(studentIds).stream()
-//            .map(classroom -> {
-//                return null;
-//            });
 
-        return List.of();
+        List<UUID> coursesIds = classroomRepository.findByStudentsIdsContains(studentIds).stream()
+            .map(ClassroomEntity::getCourseId)
+            .toList();
+
+        return courseService.getByIds(coursesIds);
     }
 
-    public List<ClassroomEntity> getStudentClasses(UUID studentId){
+    public List<ClassroomEntity> getStudentClasses(UUID studentId) throws EntityNotFoundException{
 
         Set<UUID> studentIds = Set.of(studentId);
+
+        if(!studentService.doesExist(studentId)){
+            throw new EntityNotFoundException("Student with given id does not exist");
+        }
 
         log.info("Get student classes");
 
@@ -70,12 +80,14 @@ public class ClassroomService {
 
         Set<UUID> foundClassStudentsIds = foundClassroom.getStudentsIds();
 
-        return foundClassStudentsIds.stream()
-            .map(studentService::getById)
-            .collect(Collectors.toList());
+        return studentService.getByIds(foundClassStudentsIds);
     }
 
-    public ClassroomEntity createClass(UUID courseId){
+    public ClassroomEntity createClass(UUID courseId) throws EntityNotFoundException{
+
+        if(!courseService.existsById(courseId)){
+            throw new EntityNotFoundException("Course with given id does not exist");
+        }
 
         ClassroomEntity toCreateClassroom = ClassroomEntity.builder()
             .courseId(courseId)
@@ -88,12 +100,16 @@ public class ClassroomService {
     }
 
     @Transactional
-    public Student addStudentToClass(UUID studentId, UUID classId) throws EntityNotFoundException {
+    public Student addStudentToClass(UUID studentId, UUID classId) throws EntityNotFoundException, EntityExistsException {
 
         ClassroomEntity foundClassroom = classroomRepository.findById(classId)
             .orElseThrow(() -> new EntityNotFoundException("Class with given id does not exist"));
 
         log.info("Found classroom" + foundClassroom.toString());
+
+        if(foundClassroom.getStudentsIds().contains(studentId)){
+            throw new EntityExistsException("Given student already is in the given class");
+        }
 
         foundClassroom.getStudentsIds().add(studentId);
 
@@ -109,6 +125,10 @@ public class ClassroomService {
             .orElseThrow(() -> new EntityNotFoundException("Class with given id does not exist"));
 
         log.info("Found classroom" + foundClassroom.toString());
+
+        if(!foundClassroom.getStudentsIds().contains(studentId)){
+            throw new EntityNotFoundException("Given student is not in the given class");
+        }
 
         foundClassroom.getStudentsIds().remove(studentId);
 
