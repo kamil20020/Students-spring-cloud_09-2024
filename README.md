@@ -1,6 +1,7 @@
 # Students - Spring Cloud project for learning purposes
 The app is complete with my previous assumptions.
 
+## Running app
 App can be started by running command `docker-compose up` in the `code` directory (about 14 containers).
 
 ## App architecture:
